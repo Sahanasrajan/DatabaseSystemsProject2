@@ -1,4 +1,4 @@
-# CS 6083 Spring 2026 — Question 2: Flight Web Application
+# CS 6083 Spring 2026 — Question 1: Flight Web Application
 
 A Flask web application providing a browser-based interface to the flight database.
 
