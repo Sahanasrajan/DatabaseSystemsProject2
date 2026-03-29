@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SkySearch{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Design system ── */
+    :root {
+      --bg:       #0b0f1a;
+      --surface:  #111827;
+      --border:   #1f2d44;
+      --accent:   #3b82f6;
+      --accent2:  #06b6d4;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --danger:   #ef4444;
+      --success:  #22c55e;
+      --mono:     'Space Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11,15,26,.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav .logo {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--accent2);
+      letter-spacing: .1em;
+      text-decoration: none;
+    }
+    nav .logo span { color: var(--accent); }
+    nav .breadcrumb {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* ── Container ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* ── Section header ── */
+    .section-title {
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: .5rem;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+    }
+    h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-group label {
+      font-size: .75rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .form-group select,
+    .form-group input {
+      background: #0b0f1a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .65rem .9rem;
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: .95rem;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .75rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, transform .1s;
+    }
+    .btn:hover { background: #2563eb; }
+    .btn:active { transform: scale(.98); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--accent); background: transparent; }
+    .btn-sm { padding: .4rem 1rem; font-size: .85rem; }
+    .form-footer { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+
+    /* ── Flight row ── */
+    .flight-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.4rem;
+      margin-bottom: .75rem;
+      transition: border-color .2s, box-shadow .2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .flight-row:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .flight-num {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .route {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .95rem;
+    }
+    .route .code { font-family: var(--mono); font-weight: 700; font-size: 1.05rem; }
+    .route .arrow { color: var(--muted); font-size: 1.2rem; }
+    .meta { font-size: .82rem; color: var(--muted); }
+    .meta strong { color: var(--text); }
+    .dep-time {
+      font-family: var(--mono);
+      font-size: 1rem;
+      text-align: right;
+    }
+
+    /* ── Detail ── */
+    .seats-visual {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .seats-bar-wrap { flex: 1; }
+    .seats-bar {
+      height: 10px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .seats-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transition: width .6s ease;
+    }
+    .seats-bar-fill.full { background: var(--danger); }
+    .seats-numbers { font-family: var(--mono); font-size: .9rem; white-space: nowrap; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: #0b0f1a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+    .stat-label {
+      font-size: .7rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-bottom: .3rem;
+    }
+    .stat-value { font-size: 1.4rem; font-weight: 700; }
+    .stat-value.green { color: var(--success); }
+    .stat-value.red   { color: var(--danger); }
+    .stat-value.blue  { color: var(--accent2); }
+
+    /* ── Passenger table ── */
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: .6rem .9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: .6rem .9rem; border-bottom: 1px solid #161e2e; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #0f1726; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+    }
+    .empty .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    /* ── Tag ── */
+    .tag {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 6px;
+      font-size: .75rem;
+      font-family: var(--mono);
+      background: rgba(59,130,246,.15);
+      color: var(--accent2);
+      border: 1px solid rgba(59,130,246,.3);
+    }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .flight-row { grid-template-columns: 1fr 1fr; }
+      .dep-time { grid-column: 1 / -1; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">SKY<span>SEARCH</span></a>
+  <span class="breadcrumb">{% block breadcrumb %}CS 6083 · Flight Database{% endblock %}</span>
+</nav>
+
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

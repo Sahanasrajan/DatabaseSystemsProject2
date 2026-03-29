@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}SkySearch — Find Flights{% endblock %}
+{% block breadcrumb %}CS 6083 · Flight Database{% endblock %}
+
+{% block content %}
+<p class="section-title">Flight Search</p>
+<h1>Where are you flying?</h1>
+
+<div class="card">
+  <form action="/search" method="GET">
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Origin Airport</label>
+        <select name="origin" required>
+          <option value="" disabled selected>Select origin…</option>
+          {% for ap in airports %}
+          <option value="{{ ap['airport_code'] }}">
+            {{ ap['airport_code'] }} — {{ ap['name'] }} ({{ ap['city'] }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Destination Airport</label>
+        <select name="dest" required>
+          <option value="" disabled selected>Select destination…</option>
+          {% for ap in airports %}
+          <option value="{{ ap['airport_code'] }}">
+            {{ ap['airport_code'] }} — {{ ap['name'] }} ({{ ap['city'] }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Departure From</label>
+        <input type="date" name="date_from" value="2025-12-29" required>
+      </div>
+
+      <div class="form-group">
+        <label>Departure To</label>
+        <input type="date" name="date_to" value="2025-12-31" required>
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn">
+        &#9992; Search Flights
+      </button>
+    </div>
+  </form>
+</div>
+
+<div style="margin-top:2rem; color: var(--muted); font-size:.85rem;">
+  <p><strong style="color:var(--text);">Quick test:</strong>
+     Try <code style="background:#111827;padding:.1rem .4rem;border-radius:4px;">JFK → LAX</code>
+     between <code style="background:#111827;padding:.1rem .4rem;border-radius:4px;">2025-12-29</code>
+     and <code style="background:#111827;padding:.1rem .4rem;border-radius:4px;">2025-12-31</code>.
+  </p>
+</div>
+{% endblock %}

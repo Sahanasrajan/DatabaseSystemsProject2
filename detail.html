@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}SkySearch — {{ flight.flight_number if flight else 'Not Found' }}{% endblock %}
+{% block breadcrumb %}
+  <a href="/" style="color:var(--muted);text-decoration:none;">Search</a>
+  &nbsp;/&nbsp;
+  <a href="javascript:history.back()" style="color:var(--muted);text-decoration:none;">Results</a>
+  &nbsp;/&nbsp; {{ flight.flight_number if flight else '—' }}
+{% endblock %}
+
+{% block content %}
+
+{% if not flight %}
+  <div class="empty">
+    <div class="icon">🔍</div>
+    <p>Flight not found.</p>
+    <a href="/" class="btn btn-outline" style="margin-top:1.5rem;">← Back to Search</a>
+  </div>
+
+{% else %}
+
+<p class="section-title">Flight Detail</p>
+<h1>
+  {{ flight.flight_number }}
+  <span style="font-weight:300;color:var(--muted);">
+    &nbsp;{{ flight.origin_code }} → {{ flight.dest_code }}
+  </span>
+</h1>
+
+<!-- ── Stats row ── -->
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Departure</div>
+    <div class="stat-value blue">{{ flight.departure_time }}</div>
+    <div style="font-size:.8rem;color:var(--muted);">GMT</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-label">Date</div>
+    <div class="stat-value" style="font-size:1.1rem;">{{ flight.departure_date }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-label">Aircraft</div>
+    <div class="stat-value" style="font-size:1.1rem;">{{ flight.plane_type }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-label">Capacity</div>
+    <div class="stat-value blue">{{ flight.capacity }}</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-label">Booked</div>
+    <div class="stat-value {% if booked == flight.capacity %}red{% else %}blue{% endif %}">
+      {{ booked }}
+    </div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-label">Available</div>
+    <div class="stat-value {% if available == 0 %}red{% elif available <= 3 %}blue{% else %}green{% endif %}">
+      {{ available }}
+    </div>
+  </div>
+</div>
+
+<!-- ── Seat bar ── -->
+<div class="card" style="padding:1.2rem 1.5rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;">
+    <span style="font-size:.85rem;color:var(--muted);">Seat occupancy</span>
+    <span class="seats-numbers">
+      {{ booked }} / {{ flight.capacity }} seats filled
+      &nbsp;·&nbsp;
+      {% set pct = (booked / flight.capacity * 100)|int %}
+      {{ pct }}%
+    </span>
+  </div>
+  <div class="seats-bar">
+    <div class="seats-bar-fill {% if available == 0 %}full{% endif %}"
+         style="width: {{ (booked / flight.capacity * 100)|round(1) }}%">
+    </div>
+  </div>
+  {% if available == 0 %}
+  <p style="margin-top:.6rem;font-size:.8rem;color:var(--danger);">
+    ⚠ This flight is fully booked.
+  </p>
+  {% elif available <= 3 %}
+  <p style="margin-top:.6rem;font-size:.8rem;color:var(--accent2);">
+    ⚡ Only {{ available }} seat{{ 's' if available != 1 }} left!
+  </p>
+  {% else %}
+  <p style="margin-top:.6rem;font-size:.8rem;color:var(--success);">
+    ✓ {{ available }} seat{{ 's' if available != 1 }} available.
+  </p>
+  {% endif %}
+</div>
+
+<!-- ── Route info ── -->
+<div class="card" style="padding:1.2rem 1.5rem;margin-bottom:1rem;">
+  <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:center;">
+    <div>
+      <div class="meta">Airline</div>
+      <div style="font-weight:600;">{{ flight.airline_name }}</div>
+    </div>
+    <div>
+      <div class="meta">Origin</div>
+      <div><span style="font-family:var(--mono);color:var(--accent);">{{ flight.origin_code }}</span>
+        &nbsp;{{ flight.origin_name }}</div>
+    </div>
+    <div>
+      <div class="meta">Destination</div>
+      <div><span style="font-family:var(--mono);color:var(--accent);">{{ flight.dest_code }}</span>
+        &nbsp;{{ flight.dest_name }}</div>
+    </div>
+    <div>
+      <div class="meta">Duration</div>
+      <div>{{ flight.duration }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Passenger manifest ── -->
+{% if passengers %}
+<div class="card" style="padding:0;overflow:hidden;">
+  <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);">
+    <h2 style="margin:0;">Passenger Manifest</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Seat</th>
+        <th>Passenger</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in passengers %}
+      <tr>
+        <td style="color:var(--muted);font-family:var(--mono);font-size:.8rem;">{{ loop.index }}</td>
+        <td><span class="tag">{{ p.seat_number }}</span></td>
+        <td>{{ p.passenger_name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div style="margin-top:1.5rem;">
+  <a href="javascript:history.back()" class="btn btn-outline btn-sm">← Back to Results</a>
+</div>
+
+{% endif %}
+{% endblock %}

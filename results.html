@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}SkySearch — Results{% endblock %}
+{% block breadcrumb %}
+  <a href="/" style="color:var(--muted);text-decoration:none;">Search</a>
+  &nbsp;/&nbsp; Results
+{% endblock %}
+
+{% block content %}
+
+<p class="section-title">Search Results</p>
+{% if search %}
+<h1>
+  {{ search.origin }} &rarr; {{ search.dest }}
+  <span style="font-size:1rem;color:var(--muted);font-weight:400;">
+    &nbsp; {{ search.date_from }} – {{ search.date_to }}
+  </span>
+</h1>
+{% else %}
+<h1>Available Flights</h1>
+{% endif %}
+
+{% if flights %}
+  <p style="color:var(--muted);margin-bottom:1.5rem;font-size:.9rem;">
+    {{ flights|length }} flight{{ 's' if flights|length != 1 }} found
+    &mdash; click a row to see seat availability.
+  </p>
+
+  {% for f in flights %}
+  <a class="flight-row"
+     href="/flight/{{ f.flight_number }}/{{ f.departure_date }}">
+
+    <div>
+      <div class="flight-num">{{ f.flight_number }}</div>
+      <div class="meta" style="margin-top:.25rem;">
+        <span class="tag">{{ f.plane_type }}</span>
+      </div>
+    </div>
+
+    <div class="route">
+      <span class="code">{{ f.origin_code }}</span>
+      <span class="arrow">→</span>
+      <span class="code">{{ f.dest_code }}</span>
+      <span class="meta" style="margin-left:.5rem;">
+        {{ f.origin_name }} → {{ f.dest_name }}
+      </span>
+    </div>
+
+    <div>
+      <div class="meta">
+        <strong>{{ f.airline_name }}</strong>
+      </div>
+      <div class="meta">{{ f.departure_date }} &bull; Duration: {{ f.duration }}</div>
+    </div>
+
+    <div class="dep-time">
+      {{ f.departure_time }}
+      <div class="meta" style="text-align:right;">GMT</div>
+    </div>
+
+  </a>
+  {% endfor %}
+
+{% else %}
+  <div class="empty">
+    <div class="icon">✈️</div>
+    <p>No flights found for that route and date range.</p>
+    <a href="/" class="btn btn-outline" style="margin-top:1.5rem;">← New Search</a>
+  </div>
+{% endif %}
+
+{% if flights %}
+<div style="margin-top:1.5rem;">
+  <a href="/" class="btn btn-outline btn-sm">← New Search</a>
+</div>
+{% endif %}
+
+{% endblock %}
