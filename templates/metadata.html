@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}SkySearch — Metadata{% endblock %}
+{% block breadcrumb %}Metadata Queries{% endblock %}
+
+{% block content %}
+<p class="section-title">Problem 4</p>
+<h1>Database Metadata</h1>
+
+<!-- ── (a) ── -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <h2 style="margin-bottom:.3rem;">(a) Tables with ≥2 Foreign Keys to Distinct Tables</h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">
+    Tables that have at least two outgoing foreign keys referencing different tables.
+  </p>
+  <table>
+    <thead>
+  <tr>
+    <th>Table Name</th>
+    <th>Distinct Referenced Tables</th>
+    <th>References</th>
+  </tr>
+</thead>
+<tbody>
+  {% for row in fk_tables %}
+  <tr>
+    <td><span class="tag">{{ row.table_name }}</span></td>
+    <td>{{ row.distinct_referenced_tables }}</td>
+    <td style="font-family:var(--mono);font-size:.85rem;">{{ row.references }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="3" style="color:var(--muted);">No results</td></tr>
+  {% endfor %}
+</tbody>
+  </table>
+</div>
+
+<!-- ── (b) ── -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <h2 style="margin-bottom:.3rem;">(b) Date / Timestamp Columns</h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">
+    All columns configured to store date or time type values.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Column</th>
+        <th>Data Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in date_cols %}
+      <tr>
+        <td><span class="tag">{{ row.table_name }}</span></td>
+        <td style="font-family:var(--mono);font-size:.85rem;">{{ row.column_name }}</td>
+        <td style="color:var(--muted);font-size:.85rem;">{{ row.data_type }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" style="color:var(--muted);">No results</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ── (c) ── -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <h2 style="margin-bottom:.3rem;">(c) Distinct Values per Column in Flight</h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">
+    How many unique values each attribute in the Flight table currently holds.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Attribute</th>
+        <th>Distinct Values</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in distinct_vals %}
+      <tr>
+        <td style="font-family:var(--mono);font-size:.85rem;">{{ row.attribute }}</td>
+        <td>{{ row.distinct_values }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="2" style="color:var(--muted);">No results</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ── (d) ── -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <h2 style="margin-bottom:.3rem;">(d) Tables with Composite Primary Keys</h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">
+    Tables whose primary key consists of more than one attribute.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>PK Column Count</th>
+        <th>PK Columns</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in composite_keys %}
+      <tr>
+        <td><span class="tag">{{ row.table_name }}</span></td>
+        <td>{{ row.pk_column_count }}</td>
+        <td style="font-family:var(--mono);font-size:.85rem;">{{ row.pk_columns }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" style="color:var(--muted);">No results</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ── (e) ── -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <h2 style="margin-bottom:.3rem;">(e) Columns Containing "name"</h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">
+    All attributes across the database whose column name contains the substring "name".
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Column</th>
+        <th>Data Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in name_cols %}
+      <tr>
+        <td><span class="tag">{{ row.table_name }}</span></td>
+        <td style="font-family:var(--mono);font-size:.85rem;">{{ row.column_name }}</td>
+        <td style="color:var(--muted);font-size:.85rem;">{{ row.data_type }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" style="color:var(--muted);">No results</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <a href="/" class="btn btn-outline btn-sm">← Back to Search</a>
+</div>
+{% endblock %}

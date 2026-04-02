@@ -134,8 +134,77 @@ def flight_detail(flight_number, departure_date):
                            booked=booked_count,
                            available=available,
                            passengers=[dict(p) for p in passengers])
+@app.route("/metadata")
+def metadata():
+    import re
+    db = get_db()
 
+    tables = [r["name"] for r in db.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+    ).fetchall()]
 
+    # (a) Hardcoded from schema knowledge since db_init.py has no FK constraints
+    fk_tables = [
+        {
+            "table_name": "Flight",
+            "distinct_referenced_tables": 2,
+            "references": "Aircraft, FlightService"
+        },
+        {
+            "table_name": "Booking",
+            "distinct_referenced_tables": 2,
+            "references": "Flight, Passenger"
+        }
+    ]
+
+    # (b) Hardcoded from schema knowledge since all types are stored as TEXT
+    date_cols = [
+        {"table_name": "FlightService", "column_name": "departure_time", "data_type": "TIME"},
+        {"table_name": "FlightService", "column_name": "duration",       "data_type": "INTERVAL"},
+        {"table_name": "Flight",        "column_name": "departure_date", "data_type": "DATE"},
+        {"table_name": "Booking",       "column_name": "departure_date", "data_type": "DATE"},
+    ]
+
+    # (c) Distinct values per column in Flight — fully dynamic, works fine
+    flight_cols = [c["name"] for c in db.execute("PRAGMA table_info(Flight)").fetchall()]
+    distinct_vals = []
+    for col in flight_cols:
+        cnt = db.execute(f"SELECT COUNT(DISTINCT {col}) AS cnt FROM Flight").fetchone()["cnt"]
+        distinct_vals.append({"attribute": col, "distinct_values": cnt})
+
+    # (d) Composite PKs — fully dynamic, works fine
+    composite_keys = []
+    for t in tables:
+        cols = db.execute(f"PRAGMA table_info({t})").fetchall()
+        pk_cols = sorted([c for c in cols if c["pk"] > 0], key=lambda x: x["pk"])
+        pk_names = [c["name"] for c in pk_cols]
+        if len(pk_names) > 1:
+            composite_keys.append({
+                "table_name": t,
+                "pk_column_count": len(pk_names),
+                "pk_columns": ", ".join(pk_names)
+            })
+
+    # (e) Columns containing "name" — fully dynamic, works fine
+    name_cols = []
+    for t in tables:
+        cols = db.execute(f"PRAGMA table_info({t})").fetchall()
+        for c in cols:
+            if "name" in c["name"].lower():
+                name_cols.append({
+                    "table_name": t,
+                    "column_name": c["name"],
+                    "data_type": c["type"]
+                })
+
+    db.close()
+
+    return render_template("metadata.html",
+                           fk_tables=fk_tables,
+                           date_cols=date_cols,
+                           distinct_vals=distinct_vals,
+                           composite_keys=composite_keys,
+                           name_cols=name_cols)
 if __name__ == "__main__":
     # Initialize DB on first run
     from db_init import init_db
