@@ -205,6 +205,40 @@ def metadata():
                            distinct_vals=distinct_vals,
                            composite_keys=composite_keys,
                            name_cols=name_cols)
+@app.route("/query", methods=["GET", "POST"])
+def query_runner():
+    from flask import request
+    results = []
+    columns = []
+    error = None
+    query = ""
+
+    if request.method == "POST":
+        query = request.form.get("query", "").strip()
+        if query:
+            db = get_db()
+            try:
+                if query.upper().startswith("SELECT"):
+                    rows = db.execute(query).fetchall()
+                    if rows:
+                        columns = list(rows[0].keys())
+                        results = [list(r) for r in rows]
+                    else:
+                        error = "Query ran successfully but returned no results."
+                else:
+                    db.execute(query)
+                    db.commit()
+                    error = "Query executed successfully!"
+            except Exception as e:
+                error = f"Error: {str(e)}"
+            finally:
+                db.close()
+
+    return render_template("query.html",
+                           results=results,
+                           columns=columns,
+                           error=error,
+                           query=query)                           
 if __name__ == "__main__":
     # Initialize DB on first run
     from db_init import init_db

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}SkySearch — Query Runner{% endblock %}
+{% block breadcrumb %}Query Runner{% endblock %}
+
+{% block content %}
+<p class="section-title">Live Query</p>
+<h1>Run a Query</h1>
+
+<div class="card" style="margin-bottom:1.5rem;">
+  <form method="POST" action="/query">
+    <div class="form-group">
+      <label>SQL Query</label>
+      <textarea name="query" rows="5"
+        style="background:#0b0f1a;border:1px solid var(--border);color:var(--text);
+               padding:.75rem;border-radius:8px;font-family:var(--mono);
+               font-size:.9rem;width:100%;resize:vertical;"
+        placeholder="e.g. SELECT * FROM Airport"
+      >{{ query }}</textarea>
+    </div>
+    <div class="form-footer">
+      <button type="submit" class="btn">Run Query</button>
+    </div>
+  </form>
+</div>
+
+{% if error %}
+<div class="card">
+  <p style="color:var(--danger);">{{ error }}</p>
+</div>
+{% endif %}
+
+{% if results %}
+<div class="card" style="padding:0;overflow:hidden;">
+  <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--border);">
+    <span style="font-size:.85rem;color:var(--muted);">{{ results|length }} row(s)</span>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          {% for col in columns %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          {% for val in row %}
+          <td>{{ val }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div style="margin-top:1.5rem;">
+  <a href="/" class="btn btn-outline btn-sm">Back to Search</a>
+</div>
+{% endblock %}
