@@ -238,7 +238,56 @@ def query_runner():
                            results=results,
                            columns=columns,
                            error=error,
-                           query=query)                           
+                           query=query)    
+@app.route("/admin")
+def admin():
+    db = get_db()
+    airports = db.execute("SELECT airport_code FROM Airport ORDER BY airport_code").fetchall()
+    aircraft = db.execute("SELECT plane_type FROM Aircraft ORDER BY plane_type").fetchall()
+    db.close()
+    return render_template("admin.html", airports=airports, aircraft=aircraft)
+
+
+@app.route("/admin/add_airport", methods=["POST"])
+def add_airport():
+    from flask import redirect, url_for
+    airport_code = request.form["airport_code"].upper().strip()
+    name         = request.form["name"].strip()
+    city         = request.form["city"].strip()
+    country      = request.form["country"].strip()
+    db = get_db()
+    db.execute("INSERT INTO Airport VALUES (?, ?, ?, ?)",
+               (airport_code, name, city, country))
+    db.commit()
+    db.close()
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/add_aircraft", methods=["POST"])
+def add_aircraft():
+    from flask import redirect, url_for
+    plane_type = request.form["plane_type"].strip()
+    capacity   = int(request.form["capacity"])
+    db = get_db()
+    db.execute("INSERT INTO Aircraft VALUES (?, ?)", (plane_type, capacity))
+    db.commit()
+    db.close()
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/add_flight", methods=["POST"])
+def add_flight():
+    from flask import redirect, url_for
+    db = get_db()
+    db.execute("INSERT INTO Flight VALUES (?, ?, ?)",
+               (
+                   request.form["flight_number"].upper().strip(),
+                   request.form["departure_date"].strip(),
+                   request.form["plane_type"].strip()
+               ))
+    db.commit()
+    db.close()
+    return redirect(url_for("admin"))                                                  
 if __name__ == "__main__":
     # Initialize DB on first run
     from db_init import init_db
